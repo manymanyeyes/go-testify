@@ -3,13 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"strconv"
 	"strings"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var cafeList = map[string][]string{
@@ -52,61 +47,4 @@ func mainHandle(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(answer))
-}
-
-func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
-	city := "moscow"
-	count := 10
-	totalCount := len(cafeList[city])
-
-	url := createURL(city, count)
-	req := httptest.NewRequest("GET", url, nil)
-
-	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(mainHandle)
-	handler.ServeHTTP(responseRecorder, req)
-
-	msg := fmt.Sprintf("expected status code: %d, got %d", http.StatusOK, responseRecorder.Code)
-	require.Equalf(t, http.StatusOK, responseRecorder.Code, msg)
-
-	body := responseRecorder.Body.String()
-	list := strings.Split(body, ",")
-
-	assert.Len(t, list, totalCount)
-}
-
-func TestMainHandlerWhenCityIsNotSupported(t *testing.T) {
-	city := "Saint Petersburg"
-	count := 2
-
-	url := createURL(city, count)
-	req := httptest.NewRequest("GET", url, nil)
-
-	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(mainHandle)
-	handler.ServeHTTP(responseRecorder, req)
-
-	msg := fmt.Sprintf("expected status code: %d, got %d", http.StatusBadRequest, responseRecorder.Code)
-	require.Equalf(t, http.StatusBadRequest, responseRecorder.Code, msg)
-
-	body := responseRecorder.Body.String()
-	assert.Equal(t, body, "wrong city value")
-}
-
-func TestMainHandlerWhenTheStatusIsCorrect(t *testing.T) {
-	city := "moscow"
-	count := 2
-
-	url := createURL(city, count)
-	req := httptest.NewRequest("GET", url, nil)
-
-	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(mainHandle)
-	handler.ServeHTTP(responseRecorder, req)
-
-	msg := fmt.Sprintf("expected status code: %d, got %d", http.StatusOK, responseRecorder.Code)
-	require.Equalf(t, http.StatusOK, responseRecorder.Code, msg)
-
-	body := responseRecorder.Body.String()
-	assert.NotEmpty(t, body)
 }
