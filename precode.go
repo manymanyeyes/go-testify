@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,10 +8,6 @@ import (
 
 var cafeList = map[string][]string{
 	"moscow": []string{"Мир кофе", "Сладкоежка", "Кофе и завтраки", "Сытый студент"},
-}
-
-func createURL(city string, count int) string {
-	return fmt.Sprintf("/cafe?count=%d&city=%s", count, city)
 }
 
 func mainHandle(w http.ResponseWriter, req *http.Request) {
